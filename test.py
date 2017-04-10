@@ -2,6 +2,7 @@
 import sys
 import math
 
+
 # print sys.version
 # print'\n'.join([''.join([('AndyLove'[(x-y)%8]if((x*0.05)**2+(y*0.1)**2-1)**3-(x*0.05)**2*(y*0.1)**3<=0 else' ')for x in range(-30,30)])for y in range(15,-15,-1)])
 # print'\n'.join([''.join(['*'if abs((lambda a:lambda z,c,n:a(a,z,c,n))(lambda s,z,c,n:z if n==0else s(s,z*z+c,c,n-1))(0,0.02*x+0.05j*y,40))<2 else' 'for x in range(-80,20)])for y in range(-20,20)])
@@ -407,7 +408,7 @@ import math
 # print f2()
 # print f3()
 
-#装饰器 引入functools解决now函数的__name__被修改成wrapper的问题
+# 装饰器 引入functools解决now函数的__name__被修改成wrapper的问题
 # import datetime
 # import functools
 # def log(text='execute'):
@@ -426,13 +427,80 @@ import math
 # now()
 
 # 偏函数
-print int('101', base=2)
-def int2(x, base=2):
-    return int(x, base)
+# print int('101', base=2)
+# def int2(x, base=2):
+#     return int(x, base)
+#
+# print int2('1001')
+# import functools
+# int2_new = functools.partial(int, base=2)
+# int2_new2 = lambda x, base=2: int(x, base)
+# print int2_new('10101')
+# print int2_new2('101')
 
-print int2('1001')
-import functools
-int2_new = functools.partial(int, base=2)
-int2_new2 = lambda x, base=2: int(x, base)
-print int2_new('10101')
-print int2_new2('101')
+# 别名
+# try:
+#     import cStringIO as StringIO
+# except ImportError:
+#     import StringIO
+
+# try:
+#     import json # python >= 2.6
+# except ImportError:
+#     import simplejson as json # python <= 2.5
+
+# 利用__future__做版本兼容
+# from __future__ import unicode_literals
+# print '\'xxx\' is unicode?', isinstance('xxx', unicode)
+# print 'u\'xxx\' is unicode?', isinstance(u'xxx', unicode)
+# print '\'xxx\' is str?', isinstance('xxx', str)
+# print 'b\'xxx\' is str?', isinstance(b'xxx', str)
+
+# 类名要大写 (object)表示继承自object
+# __name 在类的外部无法访问
+# szh.sex = 'nan'可以给实例动态增加属性
+# class Student(object):
+#     def __init__(self, name, score):
+#         self.__name = name
+#         self.__score = score
+#
+#     def print_score(self):
+#         print '%s: %s' % (self.__name, self.__score)
+#
+# szh = Student('szh', 100)
+# szh.score = 99
+# szh.sex = 'nan'
+# szh.name = 'Sun Zehua'
+# szh.print_score()
+# print szh.sex
+
+# zzq = Student('hbb', 95)
+# print zzq.sex
+
+# 继承
+class Animal(object):
+    def run(self):
+        print 'Animall is running'
+
+class Dog(Animal):
+    def run(self):
+        print 'Dog is running'
+
+class Cat(Animal):
+    def run(self):
+        print 'Cat is running'
+
+dog = Dog()
+dog.run()
+cat = Cat()
+cat.run()
+
+print isinstance(dog, Animal)
+print type(cat) == Cat
+import types
+print type('abc') == types.StringType
+# dir类似于C#的反射
+print dir(cat)
+print hasattr(cat, 'run')
+r = getattr(cat, 'run')
+print r()
