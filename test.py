@@ -478,29 +478,219 @@ import math
 # print zzq.sex
 
 # 继承
-class Animal(object):
-    def run(self):
-        print 'Animall is running'
-
-class Dog(Animal):
-    def run(self):
-        print 'Dog is running'
-
-class Cat(Animal):
-    def run(self):
-        print 'Cat is running'
-
-dog = Dog()
-dog.run()
-cat = Cat()
-cat.run()
-
-print isinstance(dog, Animal)
-print type(cat) == Cat
-import types
-print type('abc') == types.StringType
+# class Animal(object):
+#     def run(self):
+#         print 'Animall is running'
+#
+# class Dog(Animal):
+#     def run(self):
+#         print 'Dog is running'
+#
+# class Cat(Animal):
+#     def run(self):
+#         print 'Cat is running'
+#
+# dog = Dog()
+# dog.run()
+# cat = Cat()
+# cat.run()
+#
+# print isinstance(dog, Animal)
+# print type(cat) == Cat
+# import types
+# print type('abc') == types.StringType
 # dir类似于C#的反射
-print dir(cat)
-print hasattr(cat, 'run')
-r = getattr(cat, 'run')
-print r()
+# print dir(cat)
+# print hasattr(cat, 'run')
+# r = getattr(cat, 'run')
+# print r()
+
+
+# class Student(object):
+#     pass
+#
+# s = Student()
+# 动态绑定一个属性
+# s.name = 'Michael'
+# print s.name
+#
+# def set_age(self, age):
+#     self.age = age
+# 绑定方法 这种方式只能给一个实例绑定，对Student的其它实例不生效
+# from types import MethodType
+# s.set_age = MethodType(set_age, s, Student)
+# s.set_age(25)
+# print s.age
+
+# 给所有实例绑定方法
+# Student.set_age = MethodType(set_age, None, Student)
+# s2 = Student()
+# s2.set_age(55)
+# print s2.age
+
+# 使用__slots__可以限制能够动态添加的属性，__slots__只对当前类生效，对子类不生效
+# class Student(object):
+#     __slots__ = ('name', 'age')
+#
+# s = Student()
+# s.name = 'hbb'
+# s.age = 1
+# s.score = 100 # 出错
+#
+# class GraduateStudent(Student):
+#     pass
+# s2 = GraduateStudent()
+# s2.score = 0 # __slots__不生效
+#
+# class GoodStudent(Student):
+#     __slots__ = ('score', 'sex')
+#
+# s3 = GoodStudent()
+# s3.name = 'szh'
+# s3.sex = 'nan'
+# s3.city = 'js' # 出错，子类如果也有__slots__则范围则是父类和子类的并集
+
+# 通过get set方法限制属性的范围和对参数进行检查
+# class Student(object):
+#     def get_score(self):
+#         return self._score
+#
+#     def set_score(self, value):
+#         if not isinstance(value, int):
+#             raise ValueError('score must be an integer!')
+#         if value < 0 or value > 100:
+#             raise ValueError('score must between 0 ~ 100!')
+#         self._score = value
+#
+# s = Student()
+# s.set_score(60)
+# print s.get_score()
+
+# 上面的方法调用起来略显复杂，可以使用@property来进行简化
+# 使用了@property后自动创建了另一个装饰器@get函数的名称.setter
+# class Student(object):
+#     @property
+#     def score(self):
+#         return self._score
+#
+#     @score.setter
+#     def score(self, value):
+#         if not isinstance(value, int):
+#             raise ValueError('score must be an integer!')
+#         if value < 0 or value > 100:
+#             raise ValueError('score must between 0 ~ 100!')
+#         self._score = value
+#
+#     @property
+#     def age(self):
+#         return 20
+#
+# s = Student()
+# s.score = 77
+# print s.score
+# s.age = 20 # age是只读属性
+
+# 多重继承 多重继承的方式被称为Mixin
+# class Animal(object):
+#     pass
+# 大类
+# class Mammal(Animal):
+#     pass
+#
+# class Bird(Animal):
+#     pass
+# 各种动物
+# class Dog(Mammal):
+#     pass
+#
+# class Bat(Mammal):
+#     pass
+#
+# class Parrot(Bird):
+#     pass
+#
+# class Ostrich(Bird):
+#     pass
+# 要给动物加上Runnable和Flyable的功能，则定义Runnable和Flyable的类
+# class Runnable(object):
+#     def run(self):
+#         print 'Running...'
+#
+# class Flyable(object):
+#     def fly(self):
+#         print 'Flying...'
+
+# 对于需要Runnable的动物，则多继承一个Runnable，如Cat
+# class Cat(Mammal, Runnable):
+#     pass
+
+# 对于需要Flyable的动物，则多继承一个Flyable，如Eagle
+# class Eagle(Bird, Flyable):
+#     pass
+
+# 一些定制类
+
+# __len__
+# class TestLen(object):
+#     def __len__(self):
+#         return 10
+#
+# tlen = TestLen()
+# print len(tlen)
+
+# __str__返回用户看到的字符串，__repr__返回程序开发者看到字符串，通常__str__和__repr__代码是一样的
+# 可以使用__repr__ = __str__来赋值__repr__
+# class TestStr(object):
+#     def __init__(self, name):
+#         self.name = name
+#     def __str__(self):
+#         return 'TestStr object (name: %s)' % self.name
+#     __repr__ = __str__
+# print TestStr('Michael')
+
+# __iter__ 如果一个类想被用于for...in循环，则必须实现__iter__方法
+# class Fib(object):
+#     def __init__(self):
+#         self.a, self.b = 0, 1
+#     def __iter__(self):
+#         return self
+#     def next(self):
+#         self.a, self.b = self.b, self.a + self.b
+#         if self.a > 100000:
+#             raise StopIteration()
+#         return self.a
+#
+# for n in Fib():
+#     print n
+
+# __getitem__ 如果实现了__iter__虽然能作用于for循环，和list有点像，但没办法像list一样取其中某个元素，
+# 要能像list的一样根据下标取元素，就必须实现__getitem__方法
+# class Fib(object):
+#     def __getitem__(self, n):
+#         a, b = 1, 1
+#         for x in range(n):
+#             a, b = b, a + b
+#         return a
+# print Fib()[20]
+
+# 光实现__getitem__是没办法使用list的切片方法的，例如range(100)[5:100]
+# 因为__getitem__传入的参数可能是int，也可能是一个切片对象slice
+# class Fib(object):
+#     def __getitem__(self, n):
+#         if isinstance(n, int):
+#             a, b = 1, 1
+#             for x in range(n):
+#                 a, b = b, a + b
+#             return a
+#         if isinstance(n, slice):
+#             start, stop = n.start, n.stop
+#             a, b = 1, 1
+#             L = []
+#             for x in range(stop):
+#                 if x >= start:
+#                     L.append(a)
+#                 a, b = b, a + b
+#             return L
+#
+# print Fib()[:10]
+# 以上没法做到Fib()[:10:2]，所以想要实现一个完整的__getitem__还有很多工作要做
