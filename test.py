@@ -694,3 +694,51 @@ import math
 #
 # print Fib()[:10]
 # 以上没法做到Fib()[:10:2]，所以想要实现一个完整的__getitem__还有很多工作要做
+
+# 使用__getattr__，可以在调用不存在的属性时进行相应的返回，不光返回值，还可以返回函数（使用lambda）
+# class Student(object):
+#     def __init__(self):
+#         self.name = 'Michael'
+#
+#     def __getattr__(self, item):
+#         if item == 'score':
+#             return 99
+#         if item == 'age':
+#             return lambda num: num * num
+#
+#         raise AttributeError('\'Student\' object has no attribute \'%s\'' % item)
+#
+#
+# s = Student()
+# print s.name
+# print s.score
+# print s.age(6)
+# print s.abc # __getattr__默认返回的是None
+
+# __getattr__的用途：链式调用
+# class Chain(object):
+#     def __init__(self, path=''):
+#         self._path = path
+#
+#     def __getattr__(self, path):
+#         if path == 'users':
+#             return lambda name: Chain('%s/%s' % (path, name))
+#         return Chain('%s/%s' % (self._path, path))
+#
+#     def __str__(self):
+#         return self._path
+
+# print Chain().status.user.timeline.list
+# GET /users/:user/repos 实际调用时需要把:user替换为实际用户名
+# print Chain().users('michael').repos
+
+# __call__，一个类如果定义了__call__，则此类的实例可以被当做函数一样调用，__call__还可以定义参数
+# class Student(object):
+#     def __init__(self, name):
+#         self.name = name
+#
+#     def __call__(self, *args, **kwargs):
+#         print 'My name is %s' % self.name
+#
+# s = Student('szh')
+# s()
