@@ -742,3 +742,231 @@ import math
 #
 # s = Student('szh')
 # s()
+
+# 使用元类
+# class Hello(object):
+#     def hello(self, name='world'):
+#         print 'Hello, %s' % name
+#
+# h = Hello()
+# h.hello()
+# print type(Hello) # Hello是一个class，它的类型是type
+# print type(h) # h是一个实例，它的类型是class Hello
+
+# type()不仅可以返回一个对象的类型，还可以创建出新的类型
+# def fn(self, name='world'):
+#     print 'Hello, %s' % name
+# dict(fnHello=fn)可以写成{'fnHello': fn}
+# CNew = type('ClassHello', (object,), dict(fnHello=fn)) # 第二个参数是一个元组，注意单个元素元组的写法(xxx,)，逗号别忘了。这里fnHello=fn可以用lambda简化。
+#
+# h2 = CNew() # 疑问：CNew 与 ClassHello的关系是？
+# h2.fnHello()
+
+# 使用metaclass来修改类的定义，有点像C#的扩展方法
+# class ListMetaclass(type):
+#     # cls:当前准备创建的类的对象
+#     # name:类的名字
+#     # bases:类继承的父类集合
+#     # attrs:类的方法集合
+#     def __new__(cls, name, bases, attrs):
+#         attrs['add'] = lambda self, value: self.append(value)
+#         return type.__new__(cls, name, bases, attrs)
+#
+# class MyList(list):
+#     __metaclass__ = ListMetaclass
+#
+# L = MyList()
+# L.add(1)
+# print L
+
+# ORM中需要用到metaclass
+# class Field(object):
+#     def __init__(self, name, column_type):
+#         self.name = name
+#         self.column_type = column_type
+#     def __str__(self):
+#         return '<%s:%s>' % (self.__class__.__name__, self.name)
+#
+# class StringField(Field):
+#     def __init__(self, name):
+#         super(StringField, self).__init__(name, 'varchar(100)')
+#
+# class IntegerField(Field):
+#     def __init__(self, name):
+#         super(IntegerField, self).__init__(name, 'bigint')
+#
+# class ModelMetaclass(type):
+#     def __new__(cls, name, bases, attrs):
+#         if name == 'Model':
+#             return type.__new__(cls, name, bases, attrs)
+#         mappings = dict()
+#         for k, v in attrs.iteritems():
+#             if isinstance(v, Field):
+#                 print 'Found mapping:%s=>%s' % (k, v)
+#                 mappings[k] = v
+#         for k in mappings.iterkeys():
+#             attrs.pop(k)
+#         attrs['__table__'] = name
+#         attrs['__mappings__'] = mappings
+#         return type.__new__(cls, name, bases, attrs)
+#
+# class Model(dict):
+#     __metaclass__ = ModelMetaclass
+#
+#     def __init__(self, **kw):
+#         super(Model, self).__init__(**kw)
+#     def __getattr__(self, key):
+#         try:
+#             return self[key]
+#         except KeyError:
+#             raise AttributeError(r"'Model' object has no attribute '%s'" & key)
+#
+#     def __setattr__(self, key, value):
+#         self[key] = value
+#
+#     def save(self):
+#         fields = []
+#         params = []
+#         args = []
+#         for k, v in self.__mappings__.iteritems():
+#             fields.append(v.name)
+#             params.append('?')
+#             args.append(getattr(self, k, None))
+#         sql = 'insert into %s (%s) values (%s)' % (self.__table__, ','.join(fields), ','.join(params))
+#         print 'SQL: %s' % sql
+#         print 'ARGS: %s' % str(args)
+#
+# class User(Model):
+#     id = IntegerField('id')
+#     name = StringField('username')
+#     email = StringField('email')
+#     password = StringField('password')
+#
+# u = User(id=12345, name='Michael', email='test@orm.org', password='my-pwd')
+# u.save()
+
+# 错误处理
+# try:
+#     print 'try...'
+#     r = 10 / 0
+#     print 'result:', r
+# except ZeroDivisionError, e:
+#     print 'except:', e
+# except ValueError, e:
+#     print 'ValueError', e
+# else:
+#     print 'no error!'
+# finally:
+#     print 'finally...'
+# print 'END'
+
+# 使用logging模块打印堆栈
+# import logging
+# def foo(s):
+#     return 10 / int(s)
+#
+# def bar(s):
+#     return foo(s) * 2
+#
+# def main():
+#     try:
+#         bar('0')
+#     except StandardError, e:
+#         logging.exception(e)
+#
+# main()
+# print 'END'
+
+# 使用raise抛出异常，尽量使用python内置的异常类型
+# class FooError(StandardError):
+#     pass
+#
+# def foo(s):
+#     n = int(s)
+#     if n == 0:
+#         raise FooError('invalid value: %s' % s)
+#     return 10 / n
+#
+# foo('0')
+
+# 捕获并抛出异常
+# def foo(s):
+#     n = int(s)
+#     return 10 / n
+#
+# def bar(s):
+#     try:
+#         return foo(s) * 2
+#     except StandardError, e:
+#         print 'Error!'
+#         raise # raise如果不带参数，则会把当前异常原样抛出; raise ValueError('input error')，把异常类型进行转化
+#
+# def main():
+#     bar('0')
+#
+# main()
+
+# 调试
+# 1.使用print，但程序发布前得删掉
+
+# 2.使用assert，虽然也会导致assert到处都是，但启用Python解释器时可以用-O参数来关闭assert，关闭后所有的assert相当于pass
+# def foo(s):
+#     n = int(s)
+#     assert n != 0, 'n is 0' # assert后第一个参数为False，第二个参数才执行；assert会抛出AssertionError
+#     return 10 / n
+#
+# foo('0')
+
+# 3.使用logging，可以输出到控制台、文件
+# import logging
+# logging.basicConfig(level=logging.INFO) #logging可以指定记录信息的级别，有debug,info,warning,error
+# s = '0'
+# n = int(s)
+# logging.info('n = %d' % n)
+# print 10 / n
+
+# 4.使用pdb
+# s = '0'
+# n = int(s)
+# print 10 / n
+
+# 单元测试
+# 可以使用python mydict_test.py进行单元测试
+# 也可以使用python -m unittest mydict_test来直接运行单元测试，这是推荐做法，因为可以一次批量运行很多单元测试
+# setUp() 和 tearDown() 函数在每个测试方法调用前后分别被执行，通常用来减少测试方法中的重复代码，比如说在
+# setUP()中连接数据库，在tearDown()关闭数据库
+
+# 文档测试，文档可以使用doctest提取出来运行
+# def abs(n):
+#     '''
+#     Function to get absolute value of number.
+#
+#     Example:
+#
+#     >>> abs(1)
+#     1
+#     >>> abs(-1)
+#     1
+#     >>> abs(0)
+#     0
+#     '''
+#     return n if n >= 0 else (-n)
+
+# 文件读写
+# f = open(r'D:\Download\无限开挂.txt'.decode('utf-8'), 'r')
+# try:
+#     f = open(r'D:\Download\test2.txt'.decode('utf-8'), 'r')
+#     print f.read()
+# except IOError, e:
+#     print '打开错误'
+# finally:
+#     if f:
+#         f.close()
+with open(r'D:\Download\test.txt'.decode('utf-8'), 'r') as f:
+    print f.read()
+# 如果文件很大，使用read()会爆内存。为了保险起见，可以使用read(size)方法，使用readline()读取一行，readlines()一次读取所有内容并按行返回
+# readlines()比较适合用在配置文件上
+with open(r'D:\Download\test.txt'.decode('utf-8'), 'r') as f:
+    for line in f.readlines():
+        print line.strip()
+
