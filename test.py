@@ -2,7 +2,6 @@
 import sys
 import math
 
-
 # print sys.version
 # print'\n'.join([''.join([('AndyLove'[(x-y)%8]if((x*0.05)**2+(y*0.1)**2-1)**3-(x*0.05)**2*(y*0.1)**3<=0 else' ')for x in range(-30,30)])for y in range(15,-15,-1)])
 # print'\n'.join([''.join(['*'if abs((lambda a:lambda z,c,n:a(a,z,c,n))(lambda s,z,c,n:z if n==0else s(s,z*z+c,c,n-1))(0,0.02*x+0.05j*y,40))<2 else' 'for x in range(-80,20)])for y in range(-20,20)])
@@ -962,11 +961,115 @@ import math
 # finally:
 #     if f:
 #         f.close()
-with open(r'D:\Download\test.txt'.decode('utf-8'), 'r') as f:
-    print f.read()
+# with open(r'C:\Users\Sun Zehua\Downloads\test.txt'.decode('utf-8'), 'rb') as f:
+#     print f.read().decode('gbk')
 # 如果文件很大，使用read()会爆内存。为了保险起见，可以使用read(size)方法，使用readline()读取一行，readlines()一次读取所有内容并按行返回
 # readlines()比较适合用在配置文件上
-with open(r'D:\Download\test.txt'.decode('utf-8'), 'r') as f:
-    for line in f.readlines():
-        print line.strip()
+# with open(r'C:\Users\Sun Zehua\Downloads\test.txt'.decode('utf-8'), 'r') as f:
+#     for line in f.readlines():
+#         print line.strip().decode('gbk', 'utf-8')
+# 当我们写文件时，操作系统往往不会立刻把数据写入磁盘，而是放到内存缓存起来，
+# 空闲的时候再慢慢写入。只有调用close()方法时，操作系统才保证把没
+# 有写入的数据全部写入磁盘。忘记调用close()的后果是数据可能只写了一部分到磁盘，剩下的丢失了。
+# 所以，还是用with语句来得保险。
+
+# import os
+# nt:windows系统 posix:Linux、Unix或MacOS
+# print os.name
+# uname()函数获取详细的系统信息，但在windows上不提供，所以os模块的有些函数是跟操作系统相关的
+# print os.uname()
+# 环境变量
+# print os.environ
+# 获取某个环境变量的值
+# print os.getenv('path')
+# 查看当前目录的绝对路径
+# print os.path.abspath('.').decode('gbk')
+# 在当前目录下创建文件夹testDir
+# 两个路径合并时，最好用join，因为不同系统的连接符不一样，有的是\，有的是/
+# strDir = os.path.join(os.path.abspath('.'), 'testDir')
+# os.mkdir(strDir)
+# 删除一个目录
+# os.rmdir(strDir)
+# 拆分路径时用split，同样是为了避免不同系统间的差异，用了split后，可以把路径拆为两部分，后一部分总是最后级别的目录或文件名
+# print os.path.split(strDir)
+# 对文件重命名
+# os.rename(r'C:\Users\Sun Zehua\Downloads\test.txt', r'C:\Users\Sun Zehua\Downloads\test2.txt')
+# os.remove(r'C:\Users\Sun Zehua\Downloads\test2.txt')
+# 但os模块中没有提供复制文件的函数，复制文件的函数在shutil模块中
+# import shutil
+# shutil.copyfile(r'C:\Users\Sun Zehua\Downloads\test.txt', r'C:\Users\Sun Zehua\Downloads\test2.txt')
+# 列出当前目录下的所有文件夹
+# print [x for x in os.listdir('.') if os.path.isdir(x)]
+# 列出当前目录下的所有的.py文件
+# print [x for x in os.listdir('.') if os.path.isfile(x) and x.endswith('.py')]
+# 或
+# print [x for x in os.listdir('.') if os.path.isfile(x) and os.path.splitext(x)[1] == '.py']
+# 注意是splittext，而不是split
+
+# dict的序列化
+# d = dict(name='szh', age=29, score=99)
+# d['age'] = 30
+# print d
+#
+# try:
+#     import cPickle as pickle
+# except ImportError:
+#     import pickle
+
+# print pickle.dumps(d)
+
+# with open('dump.txt', 'wb') as f:
+#     pickle.dump(d, f)
+#
+# with open('dump.txt', 'rb') as f:
+#     d2 = pickle.load(f)
+#     print d2
+# pickle只能在python中使用，可能不同python版本间都不兼容
+# 只能用pickle保存一些不重要的数据，不能成功反序列化也没关系
+# 要想在不同编程语言之间传递，可以使用XML，但更推荐使用JSON。JSON更快，可以直接在web页面读取
+
+# JSON类型    Python类型
+# {}          dict
+# []          list
+# "string"    'str' 或 u'unicode'
+# 1234.56     int 或 float
+# true/false  True/False
+# null        None
+
+# import json
+# d = dict(name='szh', age=29, score=99)
+# print d
+# print json.dumps(d) # 注意json的内容都是双引号，而dict是单引号
+# json_str = '{"age": 30, "score": 100, "name": "zzq"}'
+# print json.loads(json_str) # 注意反序列后得到字符串对象默认都是unicode而不是str，JSON编码是utf-8
+
+# 类的序列化
+# import json
+# class Student(object):
+#     def __init__(self, name, age, score):
+#         self.name = name
+#         self.age = age
+#         self.score = score
+#
+# s = Student('szh', 1, 0)
+# def std2dict(std):
+#     return {
+#         'name': std.name,
+#         'age': std.age,
+#         'score': std.score
+#     }
+# print json.dumps(s, default=std2dict)
+# 可以用lambda来简化
+# print json.dumps(s, default=lambda std: {'name': std.name, 'age': std.age, 'score': std.score})
+# 可以使用__dict__，把任意class实例转化为dict，除了定义了__slots__的class
+# print json.dumps(s, default=lambda std: std.__dict__)
+# JSON反序列化
+# json_str = '{"age": 30, "score": 100, "name": "zzq"}'
+# def dict2std(d):
+#     return Student(d['name'], d['age'], d['score'])
+#
+# print json.loads(json_str, object_hook=dict2std)
+# 使用lambda简化
+# print json.loads(json_str, object_hook=lambda d: Student(d['name'], d['age'], d['score']))
+
 
