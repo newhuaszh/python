@@ -1072,4 +1072,201 @@ import math
 # 使用lambda简化
 # print json.loads(json_str, object_hook=lambda d: Student(d['name'], d['age'], d['score']))
 
+# 多进程
+# import os
+# print os.getpid()
+# print os.fork() # fork在windows下不可用
+# multiprocessing是在Unix、Linux、MacOS、Windows下都通用的多进程模块
+# multiprocessing提供一个Process类代表一个进程对象
+# from multiprocessing import Process
+# import os
+# def run_proc(name):
+#     print 'Run child process %s (%s)...' % (name, os.getpid())
+#
+# if __name__ == '__main__':
+#     print 'Parent process %s' % os.getpid()
+#     p = Process(target=run_proc, args=('test',))
+#     print 'Process will start'
+#     p.start()
+#     p.join() # 等待子进程结束，用于进程间同步
+#     print 'Process end'
+
+# 如果要启动大量子进程，可以使用Pool进程池的方式批量创建子进程
+# from multiprocessing import Pool
+# import os, time, random
+# def long_time_task(name):
+#     print 'Run task %s (%s)' % (name, os.getpid())
+#     start = time.time()
+#     time.sleep(random.random() * 3)
+#     end = time.time()
+#     print 'Task %s runs %0.2f seconds' % (name, end - start)
+#
+# if __name__ == '__main__':
+#     print 'Parent process %s' % os.getpid()
+#     p = Pool()
+#     for i in range(5):
+#         p.apply_async(long_time_task, args=(i,))
+#     print 'Waiting for all subprocesses done...'
+#     p.close() # 调用join()前必须调用close()，调用close()后就不能继续添加新的Process了
+#     p.join()  # join()会等待所有子进程执行完毕
+#     print 'All subprocesses done'
+# 从输出结果可以看到，task 0,1,2,3是立刻执行的，而task 4要等待前面某个task执行完毕才能执行
+# 这是因为，Pool的默认大小在我的电脑上时4（默认是cpu的核数），因此最多同时执行4个进程
+# 这是Pool有意设计的限制，不是操作系统的限制
+# 可以通过p = Pool(5)的方式，同时跑5个进程
+
+# 进程间通信
+# multiprocessing模块包装了操作系统底层的机制，提供了Queue、Pipes等方式来交换数据
+# from multiprocessing import Process, Queue
+# import os, time, random
+
+# 写数据进程
+# def write(q):
+#     for value in ['A', 'B', 'C']:
+#         print 'Put %s to queue...' % value
+#         q.put(value)
+#         time.sleep(random.random())
+# 读数据进程
+# def read(q):
+#     while q:
+#         value = q.get(True) # 为空时一直等待
+#         print 'Get %s from queue' % value
+#
+# if __name__ == '__main__':
+#     # 父进程创建Queue，并传递给各个子进程
+#     q = Queue()
+#     pw = Process(target=write, args=(q,))
+#     pr = Process(target=read, args=(q,))
+#     # 启动写
+#     pw.start()
+#     # 启动读
+#     pr.start()
+#     # 等待写结束
+#     pw.join()
+#     # 读进程是死循环，强行结束
+#     pr.terminate()
+
+# 多线程
+# pyhton的线程是Posix Thread，而不是虚拟出来的线程
+# python标准库提供了两个模块，thread和threading，thread是低级模块，threading是高级模块，对thread进行了封装
+# 绝大多数情况下，我们只需要使用threading这个模块
+# import time, threading
+# def loop():
+#     print 'thread %s is running...' % threading.current_thread().name
+#     n = 0
+#     while n < 5:
+#         n += 1
+#         print 'thread %s >>> %s' % (threading.current_thread().name, n)
+#         time.sleep(1)
+#     print 'thread %s ended' % threading.current_thread().name
+#
+# print 'thread %s is running...' % threading.current_thread().name
+# # newThread是创建的子线程的名字，如果不起名字，python会自动起Thread-1，Thread-2
+# t = threading.Thread(target=loop, name='newThread')
+# t.start()
+# t.join()
+# print 'thread %s ended' % threading.current_thread().name
+
+# lock锁
+# import time,threading
+#
+# balance = 0
+# lock = threading.Lock()
+#
+# def change_it(n):
+#     lock.acquire() # 为什么这里可以直接使用lock，不用先global？
+#     try:
+#         global balance
+#         balance += n
+#         balance -= n
+#     finally:
+#         lock.release()
+#
+# def run_thread(n):
+#     for i in range(1000):
+#         change_it(n)
+#
+# t1 = threading.Thread(target=run_thread, args=(5,))
+# t2 = threading.Thread(target=run_thread, args=(8,))
+# t1.start()
+# t2.start()
+# t1.join()
+# t2.join()
+# print balance
+
+# 死循环测试cpu占用
+# import threading, multiprocessing
+#
+# def loop():
+#     x = 0
+#     while True:
+#         x = x ^ 1
+
+# 利用多线程只能最多占满一个cpu，这是历史遗留问题，官方的解释器CPython执行代码时有个GIL锁，线程执行前，必须先获得GIL锁
+# 然后每执行100条字节码，CPython就会自动释放GIL锁，让别的线程有机会执行。这个GIL锁实际上把所有线程的执行代码都给上了锁
+# 所以，多线程在CPyhton中只能交替执行，即使100个线程跑在100核的cpu上，也只能用到1核
+# for i in range(multiprocessing.cpu_count()):
+#     t = threading.Thread(target=loop)
+#     t.start()
+
+# 利用多进程，可以占满cpu，因为每个进程的GIL锁是独立的，互不影响
+# if __name__ == '__main__':
+#     for i in range(multiprocessing.cpu_count()):
+#         t = multiprocessing.Process(target=loop)
+#         t.start()
+
+# 多线程间的传值，利用全局dict以线程为key，存储对应的值
+# import threading, time
+# global_dict = {}
+#
+# def loop():
+#     val = global_dict[threading.current_thread()]
+#     time.sleep(1)
+#     print val
+#
+# t1 = threading.Thread(target=loop)
+# t2 = threading.Thread(target=loop)
+# global_dict[t1] = 't1'
+# global_dict[t2] = 't2'
+# t1.start()
+# t2.start()
+# 上面这种方式还是比较麻烦，实际上ThreadLocal就是解决此问题的
+# ThreadLocal里的属性对于不同线程来说是独立的
+# ThreadLocal最常用的地方是为每个线程绑定一个数据库连接，http请求，用户身份信息等
+# import threading
+# local_school = threading.local()
+#
+# def process_student():
+#     print 'Hello, %s (in %s)' % (local_school.student, threading.current_thread().name)
+#
+# def process_thread(name):
+#     local_school.student = name
+#     process_student()
+#
+# t1 = threading.Thread(target=process_thread, args=('Alice',), name='ThreadA')
+# t2 = threading.Thread(target=process_thread, args=('Bob,',), name='ThreadB')
+# t1.start()
+# t2.start()
+# t1.join()
+# t2.join()
+
+# 分布式见 taskmanager.py、taskworker.py
+
+# 正则表达式
+# 匹配
+import re
+
+if re.match(r'^\d{3}\-\d{3,8}$', '010-12345'):
+    print 'OK'
+else:
+    print 'Failed'
+
+if re.match(r'^\d{3}\-\d{3,8}$', '010 12345'):
+    print 'OK'
+else:
+    print 'Failed'
+
+# 切分字符串
+# 传统的方式
+print 'a b   c'.split(' ')
 
