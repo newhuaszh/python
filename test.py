@@ -1285,15 +1285,81 @@ import math
 # 如果一个正则表达式要重复使用很多次，我们需要预编译正则表达式，接下来重复使用时就不需要编译这个步骤了，可以直接匹配
 # re_telephone = re.compile(r'^(\d{3})-(\d{3,8})$')
 # print re_telephone.match('010-12345').groups()
-import re
-re_content = re.compile(r'\s*<data name=\"[a-zA-Z\_$][0-9a-zA-Z\_]*.(Text|Tooltip)\" xml:space=\"preserve\"\s*')
-if re_content.match('  <data name="ribbonBar1.Text" xml:space="preserve"> '):
-    print 'OK'
-else:
-    print 'NO'
+# import re
+# re_content = re.compile(r'\s*<data name=\"[a-zA-Z\_$][0-9a-zA-Z\_]*.(Text|Tooltip)\" xml:space=\"preserve\"\s*')
+# if re_content.match('  <data name="ribbonBar1.Text" xml:space="preserve"> '):
+#     print 'OK'
+# else:
+#     print 'NO'
+#
+# if re_content.match('  <data name="btnFastPhoto.Tooltip" xml:space="preserve">  '):
+#     print 'OK'
+# else:
+#     print 'NO'
 
-if re_content.match('  <data name="btnFastPhoto.Tooltip" xml:space="preserve">  '):
-    print 'OK'
-else:
-    print NO
+# 一些内建模块
+# namedtuple，可以创建tuple的子类
+# from collections import namedtuple
+#
+# Point = namedtuple('Point', ['x', 'y'])
+# p = Point(1, 2)
+# print p.x
+#
+# Circle = namedtuple('Circle', ['x', 'y', 'r'])
+# c = Circle(3, 4, 5)
+# print c.r
 
+# deque，插入、删除很高效，双向列表，适合用于队列和栈
+# from collections import deque
+#
+# q = deque(['a', 'b', 'c'])
+# q.append('d')
+# q.appendleft('e')
+# print q
+# q.pop()
+# print q
+# q.popleft()
+# print q
+
+# defaultdic，key不存在时，返回一个默认值
+# from collections import defaultdict
+#
+# d = defaultdict(lambda: 'N/A')
+# d['key1'] = 'abc'
+# print d['key1']
+# print d['key2']
+
+# OrderDict，key是有序的，按照插入顺序排列
+# from collections import OrderedDict
+#
+# d = dict([('a', 1), ('b', 2), ('c', 3)])
+# print d
+# od = OrderedDict([('a', 1), ('b', 2), ('c', 3)])
+# print od
+# print od.keys()
+# 先进先出的dict
+# class FIFODict(OrderedDict):
+#     def __init__(self, capacity):
+#         super(FIFODict, self).__init__()
+#         self._capacity = capacity
+#
+#     def __setitem__(self, key, value):
+#         containsKey = 1 if key in self else 0
+#         if len(self) - containsKey >= self._capacity:
+#             last = self.popitem(last=False)
+#             print 'remove:', last
+#         if containsKey:
+#             del self[key]
+#             print 'set:', (key, value)
+#         else:
+#             print 'add', (key, value)
+#         OrderedDict.__setitem__(self, key, value)
+
+# Counter，统计字符出现的个数
+from collections import Counter
+
+c = Counter()
+for ch in 'programming':
+    c[ch] += 1
+
+print c
