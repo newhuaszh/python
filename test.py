@@ -1356,10 +1356,11 @@ import math
 #         OrderedDict.__setitem__(self, key, value)
 
 # Counter，统计字符出现的个数
-from collections import Counter
+# from collections import Counter
+#
+# c = Counter()
+# for ch in 'programming':
+#     c[ch] += 1
+#
+# print c
 
-c = Counter()
-for ch in 'programming':
-    c[ch] += 1
-
-print c
