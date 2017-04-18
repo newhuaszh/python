@@ -61,4 +61,9 @@ def login(user, password):
 
 login('michael', '123456')
 
-# 由于常用口令的MD5值很容易被计算出来
+# 由于常用口令的MD5值很容易被计算出来，需要对原始密码加一个复杂字符串后再计算MD5，这种做法称为“加盐”
+def cal_md5(password):
+    md5_pw = hashlib.md5()
+    md5_pw.update(password + 'the-Salt')
+    return md5_pw.hexdigest()
+
