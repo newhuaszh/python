@@ -31,4 +31,21 @@ ASCII：        76         117        99        121
 再在编码的末尾加上1个或2个=号（最多2个=号，理解？），表示补了多少字节，解码的时候，会自动去掉。
 所以，Base64编码会把3字节的二进制数据编码为4字节的文本数据，长度增加33%，好处是编码后的文本数据可以在邮件正文、网页等直接显示。
 '''
+import base64
 
+print base64.b64encode('binary\x00string')
+print base64.b64decode('YmluYXJ5AHN0cmluZw==')
+print base64.b64encode('i\xb7\x1d\xfb\xef\xff')
+print base64.urlsafe_b64encode('i\xb7\x1d\xfb\xef\xff')
+print base64.urlsafe_b64decode('abcd--__')
+print base64.b64decode('YWJjZA==')
+
+def safe_b64decode(instr):
+    left = len(instr) % 4
+    if left != 0:
+        add = 4 - left
+        return base64.b64decode(instr + '=' * add)
+    else:
+        return base64.b64decode(instr)
+
+print safe_b64decode('YWJjZA')
