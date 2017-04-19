@@ -49,6 +49,6 @@ import itertools
 # for n in itertools.takewhile(lambda x: x < 100, r):
 #     print n
 # 换成map()呢？停不下来
-r = map(lambda x: x * x, itertools.count(1))
-print r
+# r = map(lambda x: x * x, itertools.count(1))
+# print r
 

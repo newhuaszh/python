@@ -14,4 +14,30 @@ class DefaultSaxHandler(object):
         print 'sex:end_element: %s, ' % name
 
     def char_data(self, text):
-        print 'sax:char_num: ' % text
+        print 'sax:char_data: %s' % text
+
+xml = r'''<?xml version="1.0"?>
+<ol>
+<li><a href="/python">Python</a></li>
+<li><a href="/ruby">Ruby</a></li>
+</ol>
+'''
+
+handler  = DefaultSaxHandler()
+parser = ParserCreate()
+# returns_unicode为True时，返回的所有element名称和char_data都是unicode，处理国家化更加方便
+parser.returns_unicode = True
+parser.StartElementHandler = handler.start_element
+parser.EndElementHandler = handler.end_element
+# 如果读取一大段字符串，CharacterDataHandler可能会被多次调用，就需要把每次获取的内容保存起来，在EndElementHandler里进行合并
+parser.CharacterDataHandler = handler.char_data
+parser.Parse(xml)
+# 大部分情况下，需要生成的XML结构都是非常简单的，所以最简单和最高效的生成XML的方法是拼接字符串
+L = []
+L.append(r'<?xml version="1.0"?>')
+L.append(r'<root>')
+L.append('some & data')
+L.append(r'</root>')
+# 将list输出成str的方式
+print ''.join(L)
+# 如果要生成复杂的XML呢？就不要用XML了，用JSON
