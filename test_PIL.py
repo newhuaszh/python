@@ -38,7 +38,7 @@ for x in range(width):
         draw.point((x, y), fill=rndColor())
 
 for t in range(4):
-    draw.text((60 * t + 10, 10), rndChar(), font=font, fill=rndColor2())
+    draw.text((64 * t + random.randint(5, 30), random.randint(5, 20)), rndChar(), font=font, fill=rndColor2())
 
 image = image.filter(ImageFilter.BLUR)
-image.save('verification code.jpeg')
+image.save('verification_code.jpeg')
