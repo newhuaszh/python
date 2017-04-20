@@ -18,4 +18,5 @@ def signin():
         return render_template('signin-ok.html', username=username)
     return render_template('form.html', message='Bad username or password', username=username)
 
-app.run()
+if __name__ == '__main__':
+    app.run()
